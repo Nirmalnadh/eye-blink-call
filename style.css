@@ -1,0 +1,21 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #111;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+video {
+  margin-top: 20px;
+  width: 90%;
+  border-radius: 12px;
+  border: 3px solid #0ff;
+}
+
+#status {
+  font-size: 18px;
+  margin-top: 10px;
+  color: #0f0;
+}
