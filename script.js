@@ -76,17 +76,22 @@ faceMesh.onResults((results) => {
     statusText.innerText = `👁️ Blink ${blinkCount}`;
   }
 
-  if (blinkCount > 0 && now - lastBlinkTime > commandTimeout) {
-    if (blinkCount === 2) {
-      statusText.innerText = `📞 Calling ${callNumber}...`;
-      window.location.href = `tel:${callNumber}`;
-    } else {
-      statusText.innerText = `Detected ${blinkCount} blinks`;
-    }
-    blinkCount = 0;
+  if (blinkCount > 0 && (now - lastBlinkTime) > commandTimeout) {
+  if (blinkCount === 2) {
+    statusText.innerText = `📞 Calling ${callNumber}...`;
+    
+    // Delay and trigger call properly for mobile browsers
+    setTimeout(() => {
+      const link = document.createElement("a");
+      link.href = `tel:${callNumber}`;
+      link.click();
+    }, 1000);
+  } else {
+    statusText.innerText = `Detected ${blinkCount} blinks`;
   }
+  blinkCount = 0;
+}
 
-  statusText.innerText += ` | Ratio: ${avgRatio.toFixed(3)}`;
 });
 
 const camera = new Camera(video, {
@@ -97,3 +102,4 @@ const camera = new Camera(video, {
   height: 220,
 });
 camera.start();
+
