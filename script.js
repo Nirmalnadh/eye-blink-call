@@ -3,7 +3,7 @@ let lastBlinkTime = 0;
 const blinkThreshold = 0.25; // eye closed ratio
 const cooldown = 0.3;
 const commandTimeout = 2;
-const callNumber = "9876543210"; // replace with your number
+const callNumber = "9949790005"; // replace with your number
 
 const video = document.getElementById('video');
 const statusText = document.getElementById('status');
@@ -69,3 +69,4 @@ const camera = new Camera(video, {
   height: 220,
 });
 camera.start();
+
