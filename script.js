@@ -17,7 +17,7 @@ navigator.mediaDevices
     video.srcObject = stream;
   })
   .catch((err) => {
-    statusText.innerText = "❌ Camera feed not accessible";
+    statusText.innerText = " Camera feed not accessible";
     console.error(err);
   });
 
@@ -73,12 +73,12 @@ faceMesh.onResults((results) => {
     blinkCount++;
     lastBlinkTime = now;
     stableFrames = 0;
-    statusText.innerText = `👁️ Blink ${blinkCount}`;
+    statusText.innerText = ` Blink ${blinkCount}`;
   }
 
   if (blinkCount > 0 && (now - lastBlinkTime) > commandTimeout) {
   if (blinkCount === 2) {
-    statusText.innerText = `📞 Calling ${callNumber}...`;
+    statusText.innerText = ` Calling ${callNumber}...`;
     
     // Delay and trigger call properly for mobile browsers
     setTimeout(() => {
@@ -102,3 +102,4 @@ const camera = new Camera(video, {
   height: 220,
 });
 camera.start();
+
