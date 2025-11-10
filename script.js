@@ -96,7 +96,7 @@ faceMesh.onResults((results) => {
       // ---- WhatsApp Message Trigger ----
       setTimeout(() => {
         const msg = "🚨 Emergency Alert! The user triggered help via Eye Blink System.";
-        const phone = "91XXXXXXXXXX"; // replace with actual number (with country code)
+        const phone = "919949790005"; // replace with actual number (with country code)
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
       }, 1500);
 
@@ -116,3 +116,4 @@ const camera = new Camera(video, {
   height: 220,
 });
 camera.start();
+
