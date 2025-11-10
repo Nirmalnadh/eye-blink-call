@@ -2,17 +2,15 @@ let blinkCount = 0;
 let lastBlinkTime = 0;
 let stableFrames = 0;
 let ratioHistory = [];
-
 const blinkThreshold = 0.22;
 const cooldown = 0.5;
 const commandTimeout = 2.5;
-const callNumber = "9949790005"; // change if needed
+const callNumber = "9949790005";
 const maxHistory = 3;
 
 const video = document.getElementById("video");
 const statusText = document.getElementById("status");
 
-// Start camera
 navigator.mediaDevices
   .getUserMedia({ video: true })
   .then((stream) => {
@@ -23,7 +21,6 @@ navigator.mediaDevices
     console.error(err);
   });
 
-// Initialize MediaPipe FaceMesh
 const faceMesh = new FaceMesh({
   locateFile: (file) =>
     `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
@@ -51,7 +48,6 @@ function getBlinkRatio(landmarks, eye) {
   return vertical / horizontal;
 }
 
-// Main blink detection loop
 faceMesh.onResults((results) => {
   if (!results.multiFaceLandmarks) return;
 
@@ -63,8 +59,8 @@ faceMesh.onResults((results) => {
 
   ratioHistory.push(ratio);
   if (ratioHistory.length > maxHistory) ratioHistory.shift();
-
   const avgRatio = ratioHistory.reduce((a, b) => a + b, 0) / ratioHistory.length;
+
   if (avgRatio > 0.5) return;
 
   if (avgRatio < blinkThreshold) {
@@ -80,34 +76,24 @@ faceMesh.onResults((results) => {
     statusText.innerText = `👁️ Blink ${blinkCount}`;
   }
 
-  // ----- Action Trigger Section -----
   if (blinkCount > 0 && (now - lastBlinkTime) > commandTimeout) {
-    if (blinkCount === 2) {
-      statusText.innerText = "📞 Calling + Sending message...";
-      alert("🚨 HELP signal triggered!");
-
-      // ---- Call Trigger ----
-      setTimeout(() => {
-        const callLink = document.createElement("a");
-        callLink.href = `tel:${callNumber}`;
-        callLink.click();
-      }, 1000);
-
-      // ---- WhatsApp Message Trigger ----
-      setTimeout(() => {
-        const msg = "🚨 Emergency Alert! The user triggered help via Eye Blink System.";
-        const phone = "919949790005"; // replace with actual number (with country code)
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
-      }, 1500);
-
-    } else {
-      statusText.innerText = `Detected ${blinkCount} blinks`;
-    }
-    blinkCount = 0; // reset blink counter
+  if (blinkCount === 2) {
+    statusText.innerText = `📞 Calling ${callNumber}...`;
+    
+    // Delay and trigger call properly for mobile browsers
+    setTimeout(() => {
+      const link = document.createElement("a");
+      link.href = `tel:${callNumber}`;
+      link.click();
+    }, 1000);
+  } else {
+    statusText.innerText = `Detected ${blinkCount} blinks`;
   }
+  blinkCount = 0;
+}
+
 });
 
-// Start camera feed
 const camera = new Camera(video, {
   onFrame: async () => {
     await faceMesh.send({ image: video });
@@ -116,4 +102,3 @@ const camera = new Camera(video, {
   height: 220,
 });
 camera.start();
-
