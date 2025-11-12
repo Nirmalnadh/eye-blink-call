@@ -11,16 +11,18 @@ const maxHistory = 3;
 const video = document.getElementById("video");
 const statusText = document.getElementById("status");
 
+// Access the webcam
 navigator.mediaDevices
   .getUserMedia({ video: true })
   .then((stream) => {
     video.srcObject = stream;
   })
   .catch((err) => {
-    statusText.innerText = " Camera feed not accessible";
+    statusText.innerText = "Camera feed not accessible";
     console.error(err);
   });
 
+// Initialize FaceMesh
 const faceMesh = new FaceMesh({
   locateFile: (file) =>
     `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
@@ -33,6 +35,7 @@ faceMesh.setOptions({
   minTrackingConfidence: 0.7,
 });
 
+// Eye landmark indices
 const LEFT_EYE = [33, 160, 158, 133, 153, 144];
 const RIGHT_EYE = [362, 385, 387, 263, 373, 380];
 
@@ -48,6 +51,7 @@ function getBlinkRatio(landmarks, eye) {
   return vertical / horizontal;
 }
 
+// Process blink detection
 faceMesh.onResults((results) => {
   if (!results.multiFaceLandmarks) return;
 
@@ -59,7 +63,8 @@ faceMesh.onResults((results) => {
 
   ratioHistory.push(ratio);
   if (ratioHistory.length > maxHistory) ratioHistory.shift();
-  const avgRatio = ratioHistory.reduce((a, b) => a + b, 0) / ratioHistory.length;
+  const avgRatio =
+    ratioHistory.reduce((a, b) => a + b, 0) / ratioHistory.length;
 
   if (avgRatio > 0.5) return;
 
@@ -73,27 +78,35 @@ faceMesh.onResults((results) => {
     blinkCount++;
     lastBlinkTime = now;
     stableFrames = 0;
-    statusText.innerText = ` Blink ${blinkCount}`;
+    statusText.innerText = `Blink ${blinkCount}`;
   }
 
-  if (blinkCount > 0 && (now - lastBlinkTime) > commandTimeout) {
-  if (blinkCount === 2) {
-    statusText.innerText = ` Calling ${callNumber}...`;
-    
-    // Delay and trigger call properly for mobile browsers
-    setTimeout(() => {
-      const link = document.createElement("a");
-      link.href = `tel:${callNumber}`;
-      link.click();
-    }, 1000);
-  } else {
-    statusText.innerText = `Detected ${blinkCount} blinks`;
-  }
-  blinkCount = 0;
-}
+  // Detect commands after a timeout
+  if (blinkCount > 0 && now - lastBlinkTime > commandTimeout) {
+    if (blinkCount === 2) {
+      statusText.innerText = `🔔 Double blink detected! Triggering buzzer...`;
 
+      // 👉 Replace this with your ESP32 IP address
+      fetch("http://192.168.1.45/buzz")
+        .then(() => {
+          console.log("Buzzer activated!");
+        })
+        .catch((err) => console.error("Failed to trigger buzzer:", err));
+
+      // Optional: also make the phone call after 1.5s
+      setTimeout(() => {
+        const link = document.createElement("a");
+        link.href = `tel:${callNumber}`;
+        link.click();
+      }, 1500);
+    } else {
+      statusText.innerText = `Detected ${blinkCount} blinks`;
+    }
+    blinkCount = 0;
+  }
 });
 
+// Start the camera
 const camera = new Camera(video, {
   onFrame: async () => {
     await faceMesh.send({ image: video });
@@ -102,4 +115,3 @@ const camera = new Camera(video, {
   height: 220,
 });
 camera.start();
-
