@@ -11,7 +11,28 @@ const maxHistory = 3;
 const video = document.getElementById("video");
 const statusText = document.getElementById("status");
 
-// Access the webcam
+// --- Arduino Serial Setup ---
+let port;
+let writer;
+
+async function connectArduino() {
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 9600 });
+    writer = port.writable.getWriter();
+    statusText.innerText = "✅ Arduino connected";
+    console.log("Arduino connected via Serial");
+  } catch (err) {
+    statusText.innerText = "⚠️ Failed to connect Arduino";
+    console.error(err);
+  }
+}
+
+// Allow user to click status text to connect
+statusText.innerText = "Click here to connect Arduino";
+statusText.addEventListener("click", connectArduino);
+
+// --- Camera Access ---
 navigator.mediaDevices
   .getUserMedia({ video: true })
   .then((stream) => {
@@ -22,7 +43,7 @@ navigator.mediaDevices
     console.error(err);
   });
 
-// Initialize FaceMesh
+// --- FaceMesh Initialization ---
 const faceMesh = new FaceMesh({
   locateFile: (file) =>
     `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
@@ -35,7 +56,6 @@ faceMesh.setOptions({
   minTrackingConfidence: 0.7,
 });
 
-// Eye landmark indices
 const LEFT_EYE = [33, 160, 158, 133, 153, 144];
 const RIGHT_EYE = [362, 385, 387, 263, 373, 380];
 
@@ -51,7 +71,7 @@ function getBlinkRatio(landmarks, eye) {
   return vertical / horizontal;
 }
 
-// Process blink detection
+// --- Blink Detection ---
 faceMesh.onResults((results) => {
   if (!results.multiFaceLandmarks) return;
 
@@ -81,19 +101,21 @@ faceMesh.onResults((results) => {
     statusText.innerText = `Blink ${blinkCount}`;
   }
 
-  // Detect commands after a timeout
+  // --- Command Detection ---
   if (blinkCount > 0 && now - lastBlinkTime > commandTimeout) {
     if (blinkCount === 2) {
       statusText.innerText = `🔔 Double blink detected! Triggering buzzer...`;
 
-      // 👉 Replace this with your ESP32 IP address
-      fetch("http://192.168.1.45/buzz")
-        .then(() => {
-          console.log("Buzzer activated!");
-        })
-        .catch((err) => console.error("Failed to trigger buzzer:", err));
+      // Send "BUZZ" to Arduino through serial
+      if (writer) {
+        const encoder = new TextEncoder();
+        writer.write(encoder.encode("BUZZ\n"));
+        console.log("Sent BUZZ command to Arduino");
+      } else {
+        statusText.innerText = "⚠️ Please connect Arduino first!";
+      }
 
-      // Optional: also make the phone call after 1.5s
+      // Optional: make phone call after short delay
       setTimeout(() => {
         const link = document.createElement("a");
         link.href = `tel:${callNumber}`;
@@ -106,7 +128,7 @@ faceMesh.onResults((results) => {
   }
 });
 
-// Start the camera
+// --- Camera Start ---
 const camera = new Camera(video, {
   onFrame: async () => {
     await faceMesh.send({ image: video });
