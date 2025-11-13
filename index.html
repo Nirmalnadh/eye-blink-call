@@ -7,10 +7,21 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>👁️ Eye Blink Call System</h1>
-  <video id="video" autoplay playsinline></video>
-  <p id="status">Initializing camera...</p>
-  
+  <div class="container">
+    <h1>👁️ Eye Blink Controlled Call System</h1>
+    <div class="card">
+      <video id="video" autoplay playsinline></video>
+      <p id="status">🔄 Initializing camera...</p>
+      <div class="instructions">
+        <p>👉 Blink <b>twice</b> to make a call</p>
+        <p>👉 Blink <b>thrice</b> to send a help message</p>
+      </div>
+    </div>
+    <footer>
+      <p>Developed by <b>Abhishek</b>, <b>Nirmalnadh</b>, & <b>Vikas</b></p>
+    </footer>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
