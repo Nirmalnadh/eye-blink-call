@@ -1,21 +1,134 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle at top, #0a0a0a 20%, #111 100%);
+  color: #e0e0e0;
   text-align: center;
-  background-color: #111;
-  color: white;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  color: #00e5ff;
+  text-shadow: 0 0 10px #00e5ff;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.container {
+  max-width: 400px;
+  width: 90%;
+}
+
+.card {
+  background: rgba(20, 20, 20, 0.85);
+  border: 2px solid #00ffff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 video {
-  margin-top: 20px;
-  width: 90%;
+  width: 100%;
   border-radius: 12px;
-  border: 3px solid #0ff;
+  border: 2px solid #00e5ff;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
 }
 
 #status {
   font-size: 18px;
+  color: #00ff88;
   margin-top: 10px;
-  color: #0f0;
+  font-weight: 600;
+  animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+.instructions {
+  margin-top: 15px;
+  font-size: 15px;
+  color: #bbb;
+  line-height: 1.5;
+}
+
+footer {
+  margin-top: 25px;
+  font-size: 14px;
+  color: #777;
+}
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle at top, #0a0a0a 20%, #111 100%);
+  color: #e0e0e0;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  color: #00e5ff;
+  text-shadow: 0 0 10px #00e5ff;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.container {
+  max-width: 400px;
+  width: 90%;
+}
+
+.card {
+  background: rgba(20, 20, 20, 0.85);
+  border: 2px solid #00ffff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+video {
+  width: 100%;
+  border-radius: 12px;
+  border: 2px solid #00e5ff;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+}
+
+#status {
+  font-size: 18px;
+  color: #00ff88;
+  margin-top: 10px;
+  font-weight: 600;
+  animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+.instructions {
+  margin-top: 15px;
+  font-size: 15px;
+  color: #bbb;
+  line-height: 1.5;
+}
+
+footer {
+  margin-top: 25px;
+  font-size: 14px;
+  color: #777;
 }
