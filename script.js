@@ -1,4 +1,4 @@
-let blinkCount = 0;
+this is my script js code let blinkCount = 0;
 let lastBlinkTime = 0;
 let stableFrames = 0;
 let ratioHistory = [];
@@ -11,39 +11,16 @@ const maxHistory = 3;
 const video = document.getElementById("video");
 const statusText = document.getElementById("status");
 
-// --- Arduino Serial Setup ---
-let port;
-let writer;
-
-async function connectArduino() {
-  try {
-    port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600 });
-    writer = port.writable.getWriter();
-    statusText.innerText = "✅ Arduino connected";
-    console.log("Arduino connected via Serial");
-  } catch (err) {
-    statusText.innerText = "⚠️ Failed to connect Arduino";
-    console.error(err);
-  }
-}
-
-// Allow user to click status text to connect
-statusText.innerText = "Click here to connect Arduino";
-statusText.addEventListener("click", connectArduino);
-
-// --- Camera Access ---
 navigator.mediaDevices
   .getUserMedia({ video: true })
   .then((stream) => {
     video.srcObject = stream;
   })
   .catch((err) => {
-    statusText.innerText = "Camera feed not accessible";
+    statusText.innerText = " Camera feed not accessible";
     console.error(err);
   });
 
-// --- FaceMesh Initialization ---
 const faceMesh = new FaceMesh({
   locateFile: (file) =>
     `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
@@ -71,7 +48,6 @@ function getBlinkRatio(landmarks, eye) {
   return vertical / horizontal;
 }
 
-// --- Blink Detection ---
 faceMesh.onResults((results) => {
   if (!results.multiFaceLandmarks) return;
 
@@ -83,8 +59,7 @@ faceMesh.onResults((results) => {
 
   ratioHistory.push(ratio);
   if (ratioHistory.length > maxHistory) ratioHistory.shift();
-  const avgRatio =
-    ratioHistory.reduce((a, b) => a + b, 0) / ratioHistory.length;
+  const avgRatio = ratioHistory.reduce((a, b) => a + b, 0) / ratioHistory.length;
 
   if (avgRatio > 0.5) return;
 
@@ -98,37 +73,27 @@ faceMesh.onResults((results) => {
     blinkCount++;
     lastBlinkTime = now;
     stableFrames = 0;
-    statusText.innerText = `Blink ${blinkCount}`;
+    statusText.innerText = ` Blink ${blinkCount}`;
   }
 
-  // --- Command Detection ---
-  if (blinkCount > 0 && now - lastBlinkTime > commandTimeout) {
-    if (blinkCount === 2) {
-      statusText.innerText = `🔔 Double blink detected! Triggering buzzer...`;
-
-      // Send "BUZZ" to Arduino through serial
-      if (writer) {
-        const encoder = new TextEncoder();
-        writer.write(encoder.encode("BUZZ\n"));
-        console.log("Sent BUZZ command to Arduino");
-      } else {
-        statusText.innerText = "⚠️ Please connect Arduino first!";
-      }
-
-      // Optional: make phone call after short delay
-      setTimeout(() => {
-        const link = document.createElement("a");
-        link.href = `tel:${callNumber}`;
-        link.click();
-      }, 1500);
-    } else {
-      statusText.innerText = `Detected ${blinkCount} blinks`;
-    }
-    blinkCount = 0;
+  if (blinkCount > 0 && (now - lastBlinkTime) > commandTimeout) {
+  if (blinkCount === 2) {
+    statusText.innerText = ` Calling ${callNumber}...`;
+    
+    // Delay and trigger call properly for mobile browsers
+    setTimeout(() => {
+      const link = document.createElement("a");
+      link.href = `tel:${callNumber}`;
+      link.click();
+    }, 1000);
+  } else {
+    statusText.innerText = `Detected ${blinkCount} blinks`;
   }
+  blinkCount = 0;
+}
+
 });
 
-// --- Camera Start ---
 const camera = new Camera(video, {
   onFrame: async () => {
     await faceMesh.send({ image: video });
@@ -137,3 +102,4 @@ const camera = new Camera(video, {
   height: 220,
 });
 camera.start();
+
